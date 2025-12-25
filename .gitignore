@@ -1,6 +1,13 @@
+# OS files
 .DS_Store
-*.xcodeproj
-*.xcworkspace
-build/
-DerivedData/
-.generated/
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
