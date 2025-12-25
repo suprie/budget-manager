@@ -40,7 +40,9 @@ class ExpenseInteractor(
         }
 
         val budget = budgetRepository.getById(budgetId)
-        if (budget.remainingAmount < amount) {
+        // Skip insufficient funds check for Uncategorized budget (allocatedAmount = 0)
+        // This allows expenses to be added without pre-allocation
+        if (budget.allocatedAmount > 0 && budget.remainingAmount < amount) {
             throw DomainError.InsufficientFunds
         }
 

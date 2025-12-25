@@ -3,6 +3,7 @@ package com.budgetmanager.ui.navigation
 sealed class NavRoutes(val route: String) {
     data object Login : NavRoutes("auth/login")
     data object Register : NavRoutes("auth/register")
+    data object Home : NavRoutes("home")
     data object PocketList : NavRoutes("pockets")
     data object AddPocket : NavRoutes("pockets/add")
     data object PocketDetail : NavRoutes("pockets/{pocketId}") {
@@ -22,4 +23,7 @@ sealed class NavRoutes(val route: String) {
     data object AddExpense : NavRoutes("budgets/{budgetId}/expenses/add") {
         fun createRoute(budgetId: String) = "budgets/$budgetId/expenses/add"
     }
+
+    data object QuickAddExpense : NavRoutes("expenses/add")
+    data object Settings : NavRoutes("settings")
 }

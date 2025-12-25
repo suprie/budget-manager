@@ -3,6 +3,7 @@ package com.budgetmanager.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,6 +36,11 @@ fun AppNavigation() {
 
     val bottomNavItems = listOf(
         BottomNavItem(
+            route = NavRoutes.Home.route,
+            label = "Home",
+            icon = { Icon(Icons.Default.Home, contentDescription = "Home") }
+        ),
+        BottomNavItem(
             route = NavRoutes.PocketList.route,
             label = "Pockets",
             icon = { Icon(Icons.Default.AccountBalanceWallet, contentDescription = "Pockets") }
@@ -47,13 +53,14 @@ fun AppNavigation() {
     )
 
     val showBottomBar = currentRoute in listOf(
+        NavRoutes.Home.route,
         NavRoutes.PocketList.route,
         NavRoutes.BudgetList.route
     )
 
     // Determine start destination based on auth state
     val startDestination = if (authState.isLoggedIn) {
-        NavRoutes.PocketList.route
+        NavRoutes.Home.route
     } else {
         NavRoutes.Login.route
     }
@@ -67,7 +74,7 @@ fun AppNavigation() {
                             selected = currentRoute == item.route,
                             onClick = {
                                 navController.navigate(item.route) {
-                                    popUpTo(NavRoutes.PocketList.route) {
+                                    popUpTo(NavRoutes.Home.route) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
@@ -95,7 +102,7 @@ fun AppNavigation() {
                         navController.navigate(NavRoutes.Register.route)
                     },
                     onLoginSuccess = {
-                        navController.navigate(NavRoutes.PocketList.route) {
+                        navController.navigate(NavRoutes.Home.route) {
                             popUpTo(NavRoutes.Login.route) { inclusive = true }
                         }
                     }
@@ -107,10 +114,54 @@ fun AppNavigation() {
                     viewModel = authViewModel,
                     onNavigateBack = { navController.popBackStack() },
                     onRegisterSuccess = {
-                        navController.navigate(NavRoutes.PocketList.route) {
+                        navController.navigate(NavRoutes.Home.route) {
                             popUpTo(NavRoutes.Login.route) { inclusive = true }
                         }
                     }
+                )
+            }
+
+            composable(NavRoutes.Home.route) {
+                val viewModel = remember {
+                    HomeViewModel(
+                        pocketInteractor = AppContainer.pocketInteractor,
+                        budgetInteractor = AppContainer.budgetInteractor,
+                        expenseInteractor = AppContainer.expenseInteractor
+                    )
+                }
+                HomeScreen(
+                    viewModel = viewModel,
+                    onBudgetClick = { budgetId ->
+                        navController.navigate(NavRoutes.BudgetDetail.createRoute(budgetId.toString()))
+                    },
+                    onAddExpenseClick = {
+                        navController.navigate(NavRoutes.QuickAddExpense.route)
+                    },
+                    onSettingsClick = {
+                        navController.navigate(NavRoutes.Settings.route)
+                    }
+                )
+            }
+
+            composable(NavRoutes.Settings.route) {
+                val viewModel = remember { SettingsViewModel() }
+                SettingsScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(NavRoutes.QuickAddExpense.route) {
+                val viewModel = remember {
+                    QuickAddExpenseViewModel(
+                        pocketInteractor = AppContainer.pocketInteractor,
+                        budgetInteractor = AppContainer.budgetInteractor,
+                        expenseInteractor = AppContainer.expenseInteractor
+                    )
+                }
+                QuickAddExpenseScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 
@@ -226,9 +277,9 @@ fun AppNavigation() {
 
             composable(
                 route = NavRoutes.AddExpense.route,
-                arguments = listOf(navArgument("budgetId") { type = NavType.StringType })
+                arguments = listOf(navArgument("budgetId") { type = NavType.LongType })
             ) { backStackEntry ->
-                val budgetId = backStackEntry.arguments?.getString("budgetId")?.toLong()!!
+                val budgetId = backStackEntry.arguments?.getLong("budgetId")!!
                 val viewModel = remember(budgetId) {
                     AddExpenseViewModel(
                         budgetId = budgetId,

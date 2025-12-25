@@ -9,4 +9,5 @@ sealed class DomainError : Exception() {
     data object Unauthorized : DomainError()
     data class NetworkError(override val message: String) : DomainError()
     data class ServerError(override val message: String) : DomainError()
+    data class ApiError(override val message: String) : DomainError()
 }

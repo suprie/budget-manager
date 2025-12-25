@@ -134,7 +134,25 @@ class BudgetInteractor(
         )
     }
 
+    suspend fun getOrCreateUncategorizedBudget(pocketId: Long, period: String): Budget {
+        val budgets = budgetRepository.getByPeriod(period)
+        val uncategorized = budgets.find { it.name == UNCATEGORIZED_BUDGET_NAME && it.pocketId == pocketId }
+
+        return uncategorized ?: run {
+            val budget = Budget(
+                name = UNCATEGORIZED_BUDGET_NAME,
+                description = "Default budget for uncategorized expenses",
+                pocketId = pocketId,
+                allocatedAmount = 0.0,
+                period = period
+            )
+            budgetRepository.add(budget)
+        }
+    }
+
     companion object {
+        const val UNCATEGORIZED_BUDGET_NAME = "Uncategorized"
+
         fun currentPeriod(): String {
             return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
         }

@@ -8,12 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.budgetmanager.data.settings.AppSettings
+import com.budgetmanager.di.AppContainer
 import com.budgetmanager.ui.navigation.AppNavigation
 import com.budgetmanager.ui.theme.BudgetManagerTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize app settings and DI container
+        AppSettings.init(applicationContext)
+        AppContainer.init(applicationContext)
+
         enableEdgeToEdge()
         setContent {
             BudgetManagerTheme {
